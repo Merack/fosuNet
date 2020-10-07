@@ -82,9 +82,9 @@ def offline(studentID, cookie, offlineAll=False):
             }
             res = requests.post(cfg.offlineURL, headers=cfg.header, cookies=cookie, data=data)
         if len(getDeviceList(cookie)) == 0:
-            return -1
-        else:
             return "下线所有设备成功"
+        else:
+            return -1
 
 
 def login(studentID, password, service):
