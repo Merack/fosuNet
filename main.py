@@ -22,7 +22,11 @@ class Menu():
             with open(cfg.config_path + cfg.config_name, 'w', encoding='utf-8') as f:
                 self.config.write(f)
 
-        self.config.read(cfg.config_path + cfg.config_name, encoding='utf-8')
+        if cfg.debug:
+            self.config.read(cfg.config_path + cfg.dev_config_name, encoding='utf-8')
+        else:
+            self.config.read(cfg.config_path + cfg.config_name, encoding='utf-8')
+
         self.studentID = self.config['account']['studentID']
         self.password = self.config['account']['password']
         self.service = self.config['account']['service']
@@ -130,8 +134,12 @@ class Menu():
         self.config['account']['studentID'] = self.studentID
         self.config['account']['password'] = self.password
         self.config['account']['service'] = self.service
-        with open(cfg.config_path + cfg.config_name, 'w', encoding='utf-8') as f:
-            self.config.write(f)
+        if cfg.debug:
+            with open(cfg.config_path + cfg.dev_config_name, 'w', encoding='utf-8') as f:
+                self.config.write(f)
+        else:
+            with open(cfg.config_path + cfg.config_name, 'w', encoding='utf-8') as f:
+                self.config.write(f)
         print("配置文件写入成功, 路径:" + os.path.abspath(cfg.config_path + cfg.config_name))
         print("按任意键进入菜单")
         input()
