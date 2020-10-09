@@ -65,18 +65,23 @@ def offline(studentID, cookie, offlineAll=False):
         choice = input("输入设备id(按q返回): ")
         if choice == 'q':
             return -1
-        ip = devices[int(choice)]["ip"]
-        name = devices[int(choice)]["name"]
-        data = {
-            "key": studentID + ':' + ip
-        }
-        res = requests.post(cfg.offlineURL, headers=cfg.header, cookies=cookie, data=data)
-        # print("secLen: " + str(len(devices)))
-        # print("len " + str(len(getDeviceList(cookie))))
-        if res.ok:
-            return "下线 " + name + " 成功"
+        try:
+            ip = devices[int(choice)]["ip"]
+            name = devices[int(choice)]["name"]
+        except Exception as e:
+            print("请输入正确的值: ")
+            return offline(studentID, cookie, offlineAll)
         else:
-            return False
+            data = {
+                "key": studentID + ':' + ip
+            }
+            res = requests.post(cfg.offlineURL, headers=cfg.header, cookies=cookie, data=data)
+            # print("secLen: " + str(len(devices)))
+            # print("len " + str(len(getDeviceList(cookie))))
+            if res.ok:
+                return "下线 " + name + " 成功"
+            else:
+                return "下线设备失败"
     else:
         for device in devices:
             data = {
