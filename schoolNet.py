@@ -55,7 +55,7 @@ def showDevices(devices, cookie=None):
         devices = getDeviceList(cookie)
 
     for i, device in enumerate(devices):
-        print("id: " + str(i), " 设备名称: " + device["name"])
+        print("id: " + str(i), " 设备名称: " + device["name"], "  ip: " + device["ip"])
 
 
 def offline(studentID, cookie, offlineAll=False):
