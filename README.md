@@ -15,7 +15,7 @@ python main.py
 2. 你可以通过修改位于软件目录下的/config/config来更改登陆信息
 3. 为没有安装Python环境的windows用户打包了一个可以直接运行的成品, 解压后运行fosuNet.exe即可   
 release页面(github): [https://github.com/Merack/fosuNet/releases](https://github.com/Merack/fosuNet/releases)  
-release页面(gitee): [https://gitee.com/Merack/fosuNet/releases](https://gitee.com/Merack/fosuNet/releases)
+release页面(gitee)(推荐): [https://gitee.com/Merack/fosuNet/releases](https://gitee.com/Merack/fosuNet/releases)
 4. 如果你下载了我打包好的成品并解压, 可以找到 fosuNet.exe->右键->发送快捷方式到桌面 来快捷地找到并使用本程序
 
 ### 自行打包成exe文件
