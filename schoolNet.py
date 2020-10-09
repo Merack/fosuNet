@@ -40,6 +40,8 @@ def getDeviceList(cookie):
     res = requests.get(cfg.deviceURl, headers=cfg.header, cookies=cookie)
     devices = []
     doc = pq(res.text)('#a1').parent().parent()
+    if len(list(doc.items())) == 0:
+        return "当前没有在线设备"
     for i in doc.items():
         d = {"id": i('label').attr('id'), "name": i('label').text(), "ip": i('#a1').text().split(':')[-1].strip()}
         devices.append(d)
