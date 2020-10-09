@@ -27,6 +27,7 @@ class Menu():
         self.password = self.config['account']['password']
         self.service = self.config['account']['service']
         self.cookie = None
+        self.serviceList = ['电信', '移动', '联通']
         self.choices = {
             "1": self.offline,
             "2": self.login,
@@ -103,16 +104,32 @@ class Menu():
         os.system('pause')
         # input
 
+    def getService(self):
+        try:
+            index = int(input("请选择运营商id: "))
+            service = self.serviceList[index]
+        except Exception as e:
+            print("输入非法, 请输入正确的数值")
+            return self.getService()
+        else:
+            return service
+
     def changeInfo(self):
         print("请手动输入信息~")
-        self.studentID = input("学号:")
-        self.password = input("密码:")
-        self.service = input("运营商名称(电信/移动/联通):")
+        self.studentID = input("学号: ")
+        self.password = input("密码: ")
+        print("""
+运营商列表: 
+    0. 电信
+    1. 移动
+    2. 联通
+        """)
+
+        self.service = self.getService()
 
         self.config['account']['studentID'] = self.studentID
         self.config['account']['password'] = self.password
         self.config['account']['service'] = self.service
-        print("正在写入配置文件")
         with open(cfg.config_path + cfg.config_name, 'w', encoding='utf-8') as f:
             self.config.write(f)
         print("配置文件写入成功, 路径:" + os.path.abspath(cfg.config_path + cfg.config_name))
