@@ -81,32 +81,55 @@ class Menu():
             print("未在配置文件 " + os.path.abspath(cfg.config_path + cfg.config_name) + " 中检测到账号/密码/运营商,")
             self.changeInfo()
 
+    def check_login(self):
+        re = schoolNet.serviceLogin(self.studentID, self.password)
+        if re == -1:
+            print("登陆失败, 您输入的信息不正确, 请在菜单中选择'修改配置文件'重新输入")
+            print("或者前往软件目录下config文件夹中修改config.ini")
+            return False
+        else:
+            return True
+
     def quit(self):
         print("\nThank you for using this script!\n")
         sys.exit(0)
 
     def offline(self):
-        re = schoolNet.offline(self.studentID, self.cookie)
-        if re != -1:
-            print(re)
-            os.system('pause')
-
-    def offlineALL(self):
-        choice = input("您确定要下线所有设备吗(yes/no)")
-        if choice == 'yes' or choice == 'y':
-            re = schoolNet.offline(self.studentID, self.cookie, True)
+        # print(self.check_login())
+        if self.check_login():
+            re = schoolNet.offline(self.studentID, self.cookie)
             if re != -1:
                 print(re)
                 os.system('pause')
+        else:
+            os.system('pause')
+
+    def offlineALL(self):
+        if self.check_login():
+            choice = input("您确定要下线所有设备吗(yes/no)")
+            if choice == 'yes' or choice == 'y':
+                re = schoolNet.offline(self.studentID, self.cookie, True)
+                if re != -1:
+                    print(re)
+        os.system('pause')
 
     def login(self):
-        print(schoolNet.login(self.studentID, self.password, self.service))
+        re = schoolNet.login(self.studentID, self.password, self.service)
+        if re == -1:
+            print("登陆失败, 您输入的信息不正确, 请在菜单中选择'修改配置文件'重新输入")
+            print("或者前往软件目录下config文件夹中修改config.ini")
+        elif re == -2:
+            print("获取页面不正确. 您可能没有连接校园网")
+        elif re == 1:
+            print("您或许已经登录了校园网")
+        else:
+            print("登陆成功")
         os.system('pause')
 
     def showDevices(self):
-        schoolNet.showDevices(None, self.cookie)
+        if self.check_login():
+            schoolNet.showDevices(None, self.cookie)
         os.system('pause')
-        # input
 
     def getService(self):
         try:
@@ -130,6 +153,7 @@ class Menu():
         """)
 
         self.service = self.getService()
+        self.cookie = schoolNet.serviceLogin(self.studentID, self.password)
 
         self.config['account']['studentID'] = self.studentID
         self.config['account']['password'] = self.password

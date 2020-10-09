@@ -31,6 +31,8 @@ def getEncPassword(password):
 def serviceLogin(studentID, password):
     data = {"from": "rsa", "name": studentID, "password": getEncPassword(password)}
     res = requests.post(cfg.serviceLoginURL, data=data, headers=cfg.header)
+    if "errorMsg" in res.text:
+        return -1
     cookie = res.cookies
     return cookie
 
@@ -62,7 +64,7 @@ def offline(studentID, cookie, offlineAll=False):
     # print("origin len: " + str(len(devices)))
     if not offlineAll:
         showDevices(devices)
-        choice = input("输入设备id(按q返回): ")
+        choice = input("输入设备id(按q取消操作): ")
         if choice == 'q':
             return -1
         try:
@@ -99,8 +101,13 @@ def login(studentID, password, service):
     queryString = re.search(r"index\.jsp\?(.*?)'<", res.text)
     if queryString is not None:
         queryString = queryString.group(1)
+    elif "success.jsp" in res.url:
+        # 用户已经登录校园网
+        return 1
     else:
-        return "获取页面不正确.您或许已经登录或者未连接校园网"
+        # 获取页面不正确. 可能没有连接到校园网
+        return -2
+
         # return res.text
     data = {
         "userId": studentID,
@@ -110,4 +117,9 @@ def login(studentID, password, service):
         "queryString": queryString
     }
     res = requests.post(cfg.loginToURL, headers=cfg.header, data=data)
-    return "登陆成功"
+    if res.json()["result"] == "fail":
+        # 登陆失败
+        return -1
+    else:
+        # 登陆成功
+        return 0

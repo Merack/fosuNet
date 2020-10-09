@@ -20,4 +20,4 @@ config_path = './config/'
 config_name = 'config.ini'
 dev_config_name = 'config.dev.ini'
 
-debug = True
+debug = False
