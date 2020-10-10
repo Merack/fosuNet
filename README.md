@@ -8,6 +8,7 @@ pip install -r requirements.txt
 python main.py
 ```
 ### download
+(推荐) [https://gitee.com/Merack/fosuNet/releases](https://gitee.com/Merack/fosuNet/releases)  
  [https://github.com/Merack/fosuNet/releases](https://github.com/Merack/fosuNet/releases)  
 
 ### tips
