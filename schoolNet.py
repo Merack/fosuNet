@@ -43,7 +43,7 @@ def getDeviceList(cookie):
     devices = []
     doc = pq(res.text)('#a1').parent().parent()
     if len(list(doc.items())) == 0:
-        return "当前没有在线设备"
+        return -1
     for i in doc.items():
         d = {"id": i('label').attr('id'), "name": i('label').text(), "ip": i('#a1').text().split(':')[-1].strip()}
         devices.append(d)
@@ -53,16 +53,20 @@ def getDeviceList(cookie):
 def showDevices(devices, cookie=None):
     if cookie:
         devices = getDeviceList(cookie)
-
-    for i, device in enumerate(devices):
-        print("id: " + str(i), " 设备名称: " + device["name"], "  ip: " + device["ip"])
+    if devices == -1:
+        print("当前没有在线设备")
+    else:
+        for i, device in enumerate(devices):
+            print("id: " + str(i), " 设备名称: " + device["name"], "  ip: " + device["ip"])
 
 
 def offline(studentID, cookie, offlineAll=False):
     # 下线功能
     devices = getDeviceList(cookie)
-    # print("origin len: " + str(len(devices)))
+
     if not offlineAll:
+        if getDeviceList(cookie) == -1:
+            return "当前没有设备在线"
         showDevices(devices)
         choice = input("输入设备id(按q取消操作): ")
         if choice == 'q':
@@ -84,16 +88,18 @@ def offline(studentID, cookie, offlineAll=False):
                 return "下线 " + name + " 成功"
             else:
                 return "下线设备失败"
-    else:
+    elif getDeviceList(cookie) != -1:
         for device in devices:
             data = {
                 "key": studentID + ':' + device["ip"]
             }
             res = requests.post(cfg.offlineURL, headers=cfg.header, cookies=cookie, data=data)
-        if len(getDeviceList(cookie)) == 0:
+        if getDeviceList(cookie) == -1:
             return "下线所有设备成功"
         else:
             return -1
+    else:
+        return "当前没有在线设备"
 
 
 def login(studentID, password, service):
