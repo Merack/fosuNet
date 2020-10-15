@@ -109,10 +109,10 @@ def login(studentID, password, service):
         queryString = queryString.group(1)
     elif "success.jsp" in res.url:
         # 用户已经登录校园网
-        return 1
+        return 1, "您已经登录了校园网"
     else:
         # 获取页面不正确. 可能没有连接到校园网
-        return -2
+        return -2, "获取页面不正确. 您可能没有连接到校园网"
 
         # return res.text
     data = {
@@ -123,9 +123,11 @@ def login(studentID, password, service):
         "queryString": queryString
     }
     res = requests.post(cfg.loginToURL, headers=cfg.header, data=data)
-    if res.json()["result"] == "fail":
+    res.encoding = 'utf-8'
+    res = res.json()
+    if res["result"] == "fail":
         # 登陆失败
-        return -1
+        return -1, res["message"]
     else:
         # 登陆成功
-        return 0
+        return 0, "登陆成功"

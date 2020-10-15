@@ -115,15 +115,10 @@ class Menu():
 
     def login(self):
         re = schoolNet.login(self.studentID, self.password, self.service)
-        if re == -1:
-            print("登陆失败, 您输入的信息不正确, 请在菜单中选择'修改配置文件'重新输入")
-            print("或者前往软件目录下config文件夹中修改config.ini")
-        elif re == -2:
-            print("获取页面不正确. 您可能没有连接校园网")
-        elif re == 1:
-            print("您或许已经登录了校园网")
-        else:
-            print("登陆成功")
+        print(re[1])
+        if re[0] == -1:
+            print("\ntips: 如果你想修改账号信息, 可以在菜单中选择'修改配置文件'重新输入账号信息")
+            print("或者前往软件目录下config文件夹中修改config.ini来进行修改")
         os.system('pause')
 
     def showDevices(self):
