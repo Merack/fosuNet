@@ -46,4 +46,4 @@ pyinstaller fosuNet.spec
 更多使用方法请参照pyinstaller的官方文档
 
 ### 致谢
-测试人员: [小叶](https://github.com/yez78)
+测试人员: [小叶](https://github.com/yez78), 徐轩
