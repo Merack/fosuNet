@@ -36,8 +36,9 @@ class Menu():
             "1": self.offline,
             "2": self.login,
             "3": self.showDevices,
-            "4": self.offlineALL,
-            "5": self.changeInfo,
+            "4": self.offlineLocal,
+            "5": self.offlineALL,
+            "6": self.changeInfo,
             "q": self.quit
         }
 
@@ -47,8 +48,9 @@ class Menu():
         1. 下线设备
         2. 登陆校园网
         3. 列出在线设备
-        4. 下线所有设备
-        5. 修改配置文件
+        4. 下线本设备
+        5. 下线所有设备
+        6. 修改配置文件
         q. 退出程序
 """)
 
@@ -77,6 +79,11 @@ class Menu():
         input()
 
     def check(self):
+        """
+        检查配置文件中是否有值
+        如果配置为空, 则调用信息修改函数
+        :return:
+        """
         if not self.studentID or not self.password or not self.service:
             print("未在配置文件 " + os.path.abspath(cfg.config_path + cfg.config_name) + " 中检测到账号/密码/运营商,")
             self.changeInfo()
@@ -106,11 +113,18 @@ class Menu():
 
     def offlineALL(self):
         if self.check_login():
-            choice = input("您确定要下线所有设备吗(yes/no)")
+            choice = input("您确定要下线所有设备吗(y/n)")
             if choice == 'yes' or choice == 'y':
                 re = schoolNet.offline(self.studentID, self.cookie, True)
                 if re != -1:
                     print(re)
+        os.system('pause')
+
+    def offlineLocal(self):
+        if self.check_login():
+            re = schoolNet.offline(self.studentID, self.cookie, False, True)
+            if re != -1:
+                print(re)
         os.system('pause')
 
     def login(self):
@@ -127,6 +141,10 @@ class Menu():
         os.system('pause')
 
     def getService(self):
+        """
+        让用户选择是哪个运营商
+        :return:
+        """
         try:
             index = int(input("请选择运营商id: "))
             service = self.serviceList[index]

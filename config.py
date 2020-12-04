@@ -20,4 +20,8 @@ config_path = './config/'
 config_name = 'config.ini'
 dev_config_name = 'config.dev.ini'
 
+"""
+debug模式开关
+debug模式下使用的配置文件是config.dev.ini, 该文件仅存在本地, 不会随Git提交到代码库
+"""
 debug = False

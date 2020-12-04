@@ -10,14 +10,27 @@ from urllib import parse
 import re
 import config as cfg
 from Encrypt import Encrypt
+import socket
 
 
 def encrypt(e, m, message):
+    """
+    RSA加密函数
+    :param e:
+    :param m:
+    :param message:
+    :return:
+    """
     en = Encrypt(e, m)
     return en.encrypt(message)
 
 
 def getEncPassword(password):
+    """
+    获取加密后的密码
+    :param password: 用户密码
+    :return: 加密后的密码
+    """
     doc = pq(url=cfg.serviceIndexURl, encoding='utf-8')
     keyStr = doc('#publicKey').attr('value')
     split = keyStr.split('&')
@@ -28,7 +41,32 @@ def getEncPassword(password):
     return passwordEnc
 
 
+def getLocalIP():
+    """
+    返回本机ip
+    :return: 本机ip
+    """
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # s.connect(('8.8.8.8',80))
+        s.connect(('223.5.5.5', 80))
+        ip = s.getsockname()[0]
+    finally:
+        s.close()
+
+    if len(ip) == 0:
+        return -1
+    else:
+        return ip
+
+
 def serviceLogin(studentID, password):
+    """
+    登陆校园网自助服务系统
+    :param studentID: 学号
+    :param password: 密码
+    :return: cookie
+    """
     data = {"from": "rsa", "name": studentID, "password": getEncPassword(password)}
     res = requests.post(cfg.serviceLoginURL, data=data, headers=cfg.header)
     if "errorMsg" in res.text:
@@ -38,6 +76,11 @@ def serviceLogin(studentID, password):
 
 
 def getDeviceList(cookie):
+    """
+    获取在线设备
+    :param cookie: 登陆cookie
+    :return: 在线设备列表
+    """
     # 获取在线设备列表
     res = requests.get(cfg.deviceURl, headers=cfg.header, cookies=cookie)
     devices = []
@@ -51,6 +94,12 @@ def getDeviceList(cookie):
 
 
 def showDevices(devices, cookie=None):
+    """
+    show 所有设备
+    :param devices: 设备列表
+    :param cookie: 登陆cookie, 可选
+    :return: null
+    """
     if cookie:
         devices = getDeviceList(cookie)
     if devices == -1:
@@ -60,13 +109,46 @@ def showDevices(devices, cookie=None):
             print("id: " + str(i), " 设备名称: " + device["name"], "  ip: " + device["ip"])
 
 
-def offline(studentID, cookie, offlineAll=False):
+def offline(studentID, cookie, offlineAll=False, offlineLocal=False):
+    """
+    下线功能函数
+    :param studentID: 学号
+    :param cookie: 登陆cookie
+    :param offlineAll: 是否下线所有设备
+    :param offlineLocal: 是否下线本机
+    :return:
+    """
     # 下线功能
     devices = getDeviceList(cookie)
+    if len(devices) == 0:
+        return "当前没有设备在线"
 
-    if not offlineAll:
+    if offlineAll:
+        if getDeviceList(cookie) != -1:
+            for device in devices:
+                data = {
+                    "key": studentID + ':' + device["ip"]
+                }
+                res = requests.post(cfg.offlineURL, headers=cfg.header, cookies=cookie, data=data)
+            if getDeviceList(cookie) == -1:
+                return "下线所有设备成功"
+            else:
+                return -1
+
+    elif offlineLocal:
         if getDeviceList(cookie) == -1:
             return "当前没有设备在线"
+        else:
+            ip = getLocalIP()
+            data = {
+                "key": studentID + ':' + ip
+            }
+            res = requests.post(cfg.offlineURL, headers=cfg.header, cookies=cookie, data=data)
+            if res.ok:
+                return "下线 本机 成功"
+            else:
+                return "下线设备失败"
+    else:
         showDevices(devices)
         choice = input("输入设备id(按q取消操作): ")
         if choice == 'q':
@@ -88,21 +170,16 @@ def offline(studentID, cookie, offlineAll=False):
                 return "下线 " + name + " 成功"
             else:
                 return "下线设备失败"
-    elif getDeviceList(cookie) != -1:
-        for device in devices:
-            data = {
-                "key": studentID + ':' + device["ip"]
-            }
-            res = requests.post(cfg.offlineURL, headers=cfg.header, cookies=cookie, data=data)
-        if getDeviceList(cookie) == -1:
-            return "下线所有设备成功"
-        else:
-            return -1
-    else:
-        return "当前没有在线设备"
 
 
 def login(studentID, password, service):
+    """
+    校园网登陆函数
+    :param studentID: 学号
+    :param password: 密码
+    :param service: 运营商名称
+    :return: 0:登陆成功 , 1: 已经登录了, -1: 登陆失败, -2: 获取不到页面
+    """
     res = requests.get(cfg.baseLoginURL, headers=cfg.header)
     queryString = re.search(r"index\.jsp\?(.*?)'<", res.text)
     if queryString is not None:
